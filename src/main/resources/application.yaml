@@ -1,8 +1,8 @@
 spring:
   application:
-    name: tech-challenge-catalog-manager
+    name: hackaton-fiapx
   datasource:
-    url: jdbc:mysql://localhost:3306/catalog_manager
+    url: jdbc:mysql://localhost:3306/fiapx
     username: root
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver

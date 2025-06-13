@@ -1,7 +1,6 @@
 package com.fiapx.core.domain.services.ProcessVideoUseCase;
 
 import com.fiapx.core.application.exceptions.DirectoryManagerException;
-import com.fiapx.core.application.exceptions.VideoProcessingException;
 import com.fiapx.core.domain.entities.EProcessingStatus;
 import com.fiapx.core.domain.entities.ProcessingRequest;
 import com.fiapx.core.domain.repositories.IProcessingRequestRepository;
@@ -16,8 +15,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,13 +29,16 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
     private IProcessingRequestRepository processingRequestRepository;
 
     @Async
-    public ProcessingRequest execute(ProcessingRequest request) {
-        List<Path> frames;
+    public void execute(ProcessingRequest request) {
+        List<Path> frames = null;
 
         try {
             DirectoryManager.recreateDir("tempDir");
         }catch (DirectoryManagerException ex){
-            throw new VideoProcessingException(ex.getMessage());
+            request.setStatus(EProcessingStatus.ERROR);
+            request.setErrorMessage(ex.getMessage());
+            processingRequestRepository.save(request);
+            return;
         }
 
         String framePattern = "tempDir/frame_%04d.png";
@@ -51,10 +56,16 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
                     .toList();
 
             if(frames.isEmpty()){
-                throw new VideoProcessingException("Unable to extract frames");
+                request.setStatus(EProcessingStatus.ERROR);
+                request.setErrorMessage("Unable to extract frames");
+                processingRequestRepository.save(request);
+                return;
             }
         } catch (IOException e) {
-            throw new VideoProcessingException("Unable to read extracted frames. " + e.getMessage());
+            request.setStatus(EProcessingStatus.ERROR);
+            request.setErrorMessage("Unable to read extracted frames. " + e.getMessage());
+            processingRequestRepository.save(request);
+            return;
         }
 
         try{
@@ -62,10 +73,14 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
             Path zipFilePath = Path.of("output/" + request.getOutputFileName());
             ZipFileUtils.createZip(frames,zipFilePath);
         }catch (IOException e) {
-            throw new VideoProcessingException("Unable to create ZIP file. " + e.getMessage());
+            request.setStatus(EProcessingStatus.ERROR);
+            request.setErrorMessage("Unable to create ZIP file. " + e.getMessage());
+            processingRequestRepository.save(request);
+            return;
         }
 
         request.setStatus(EProcessingStatus.COMPLETED);
-        return request;
+        request.setCompleted_at(Timestamp.valueOf(LocalDateTime.now()));
+        processingRequestRepository.save(request);
     }
 }

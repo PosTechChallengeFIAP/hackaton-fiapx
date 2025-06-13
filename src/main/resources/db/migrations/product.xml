@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-    <changeSet id="create-product" author="gteixeira">
+    <changeSet id="create-process" author="gteixeira">
         <createTable tableName="product">
             <column name="id" type="binary(16)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -22,11 +22,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet>
-
-    <changeSet id="add-active-column" author="gteixeira">
-        <addColumn tableName="product">
-            <column name="active" type="boolean" defaultValue="true"/>
-        </addColumn>
     </changeSet>
 </databaseChangeLog>

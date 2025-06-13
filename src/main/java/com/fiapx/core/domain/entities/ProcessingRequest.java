@@ -32,6 +32,12 @@ public class ProcessingRequest {
     @Column(nullable = false)
     private Timestamp created_at;
 
+    @Column
+    private Timestamp completed_at;
+
+    @Column
+    private String errorMessage;
+
     public void validate() throws ValidationException {
         if (Objects.isNull(this.inputFileName) || this.inputFileName.isEmpty()) {
             throw new ValidationException("Invalid file path");
@@ -41,8 +47,6 @@ public class ProcessingRequest {
             throw new ValidationException("Invalid file extension. Use: mp4, avi, mov, mkv");
         }
     }
-
-    private
 
     @Override
     public boolean equals(Object o) {

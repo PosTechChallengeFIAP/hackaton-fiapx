@@ -27,10 +27,21 @@ public class DirectoryManager {
         }
 
         // Recreate directory
-        try{
+        createDir(dir);
+    }
+
+    public static void createDir(String dirPath) throws DirectoryManagerException {
+        Path dir = Paths.get(dirPath);
+
+        createDir(dir);
+    }
+
+    public static void createDir(Path dir) throws DirectoryManagerException {
+        try {
             Files.createDirectories(dir);
-        }catch (IOException ex){
-            throw new DirectoryManagerException("Unable to recreate temp directory. " + ex.getMessage());
+        } catch (IOException ex) {
+            throw new DirectoryManagerException(String.format("Unable to create directory '%s'. ", dir.getFileName()) +
+                    ex.getMessage());
         }
     }
 }
