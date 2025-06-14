@@ -4,29 +4,23 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-    <changeSet id="create-product" author="gteixeira">
-        <createTable tableName="product">
+    <changeSet id="create-process" author="gteixeira">
+        <createTable tableName="process">
             <column name="id" type="binary(16)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
+            <column name="input_file_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="text">
+            <column name="output_file_name" type="varchar(255)"/>
+            <column name="status" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="category" type="int">
+            <column name="created_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="price" type="double">
-                <constraints nullable="false"/>
-            </column>
+            <column name="completed_at" type="timestamp"/>
+            <column name="error_message" type="text"/>
         </createTable>
-    </changeSet>
-
-    <changeSet id="add-active-column" author="gteixeira">
-        <addColumn tableName="product">
-            <column name="active" type="boolean" defaultValue="true"/>
-        </addColumn>
     </changeSet>
 </databaseChangeLog>

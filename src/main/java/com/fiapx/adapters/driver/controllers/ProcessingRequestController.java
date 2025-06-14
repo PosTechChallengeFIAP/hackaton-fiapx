@@ -12,6 +12,7 @@ import com.fiapx.core.domain.services.FindProcessingRequestsByStatusUseCase.IFin
 import com.fiapx.core.domain.services.FindProcessingRequestsUseCase.IFindProcessingRequestsUseCase;
 import com.fiapx.core.domain.services.ProcessVideoUseCase.IProcessVideoUseCase;
 import com.fiapx.core.domain.services.SaveUploadedFileUseCase.ISaveUploadedFileUseCase;
+import com.fiapx.core.domain.services.utils.DateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -59,6 +61,9 @@ public class ProcessingRequestController {
     @Autowired
     private IFindProcessingRequestsByStatusUseCase findProcessingRequestsByStatusUseCase;
 
+    @Value("${spring.application.output-location}")
+    private String outputDir;
+
     @SuppressWarnings("rawtypes")
     @PostMapping("/process")
     @Operation(summary = "Create Processing Request", description = "This endpoint is used to create a new video " +
@@ -84,12 +89,14 @@ public class ProcessingRequestController {
             }
 
             String fileName = file.getOriginalFilename();
-            saveUploadedFileUseCase.execute(fileName, file.getInputStream());
+            Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+            String uploadedFileName = String.format("%s_%s", DateUtils.timestampToString(now), fileName);
+            saveUploadedFileUseCase.execute(uploadedFileName, file.getInputStream());
 
             ProcessingRequest request = new ProcessingRequest();
-            request.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+            request.setCreatedAt(now);
             request.setStatus(EProcessingStatus.IN_PROGRESS);
-            request.setInputFileName(String.format("%s_%s",request.getCreated_at().toString(), fileName));
+            request.setInputFileName(uploadedFileName);
 
             request = createProcessingRequestUseCase.execute(request);
 
@@ -179,7 +186,7 @@ public class ProcessingRequestController {
     public ResponseEntity downloadZipFile(@PathVariable String id){
         ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
 
-        Path filePath = Paths.get("output/" + request.getOutputFileName());
+        Path filePath = Paths.get(outputDir, request.getOutputFileName());
         Resource resource = null;
 
         try {

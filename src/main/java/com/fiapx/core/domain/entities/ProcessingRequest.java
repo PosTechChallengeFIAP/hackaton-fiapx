@@ -30,10 +30,10 @@ public class ProcessingRequest {
     private EProcessingStatus status;
 
     @Column(nullable = false)
-    private Timestamp created_at;
+    private Timestamp createdAt;
 
     @Column
-    private Timestamp completed_at;
+    private Timestamp completedAt;
 
     @Column
     private String errorMessage;

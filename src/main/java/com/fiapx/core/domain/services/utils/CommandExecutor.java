@@ -14,8 +14,7 @@ public class CommandExecutor {
         String output = "";
 
         try {
-            ProcessBuilder builder = new ProcessBuilder(args); // Windows example
-            Process process = builder.start();
+            Process process = Runtime.getRuntime().exec(joinArgs(args));
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line;
@@ -29,5 +28,16 @@ public class CommandExecutor {
         }
 
         return output;
+    }
+
+    private static String joinArgs(List<String> args){
+        if(args.isEmpty()) return "";
+        String joined = args.get(0);
+
+        for(int i = 1;i < args.size();i++){
+            joined += " " + args.get(i);
+        }
+
+        return joined;
     }
 }

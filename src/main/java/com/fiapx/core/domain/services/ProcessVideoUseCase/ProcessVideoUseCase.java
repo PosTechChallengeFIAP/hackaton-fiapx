@@ -8,6 +8,7 @@ import com.fiapx.core.domain.services.utils.CommandExecutor;
 import com.fiapx.core.domain.services.utils.DirectoryManager;
 import com.fiapx.core.domain.services.utils.ZipFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +20,18 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class ProcessVideoUseCase implements IProcessVideoUseCase {
     @Autowired
     private IProcessingRequestRepository processingRequestRepository;
+
+    @Value("${spring.application.upload-location}")
+    private String uploadDir;
+
+    @Value("${spring.application.output-location}")
+    private String outputDir;
 
     @Async
     public void execute(ProcessingRequest request) {
@@ -42,7 +47,7 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
         }
 
         String framePattern = "tempDir/frame_%04d.png";
-        String inputFile = "uploads/" + request.getInputFileName();
+        String inputFile = Paths.get(uploadDir, request.getInputFileName()).toString();
         List<String> args = Arrays.asList("ffmpeg",
                 "-i", inputFile,
                 "-vf", "fps=1",
@@ -57,7 +62,7 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
 
             if(frames.isEmpty()){
                 request.setStatus(EProcessingStatus.ERROR);
-                request.setErrorMessage("Unable to extract frames");
+                request.setErrorMessage("Unable to extract frames. " + output);
                 processingRequestRepository.save(request);
                 return;
             }
@@ -80,7 +85,7 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
         }
 
         request.setStatus(EProcessingStatus.COMPLETED);
-        request.setCompleted_at(Timestamp.valueOf(LocalDateTime.now()));
+        request.setCompletedAt(Timestamp.valueOf(LocalDateTime.now()));
         processingRequestRepository.save(request);
     }
 }

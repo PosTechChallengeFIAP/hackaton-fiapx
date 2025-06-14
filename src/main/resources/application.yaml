@@ -1,6 +1,16 @@
 spring:
   application:
     name: hackaton-fiapx
+    upload-location: uploads
+    output-location: output
+    executor:
+      pool-size: 5
+      max-pool-size: 10
+      queue-capacity: 25
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
   datasource:
     url: jdbc:mysql://localhost:3306/fiapx
     username: root
