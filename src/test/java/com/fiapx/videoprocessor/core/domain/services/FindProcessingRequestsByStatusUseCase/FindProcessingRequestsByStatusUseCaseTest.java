@@ -1,10 +1,9 @@
 package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsByStatusUseCase;
 
-import com.fiapx.core.application.exceptions.ValidationException;
-import com.fiapx.core.domain.entities.EProcessingStatus;
-import com.fiapx.core.domain.entities.ProcessingRequest;
-import com.fiapx.core.domain.repositories.IProcessingRequestRepository;
-import com.fiapx.core.domain.services.FindProcessingRequestByIdUseCase.FindProcessingRequestByIdUseCase;
+
+import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
+import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
+import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +12,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
-import static com.fiapx.core.domain.entities.EProcessingStatus.IN_PROGRESS;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus.IN_PROGRESS;
+
 import static org.mockito.Mockito.when;
 
 @SpringBootTest

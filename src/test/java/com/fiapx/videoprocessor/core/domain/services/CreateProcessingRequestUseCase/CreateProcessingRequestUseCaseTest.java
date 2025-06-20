@@ -1,8 +1,9 @@
 package com.fiapx.videoprocessor.core.domain.services.CreateProcessingRequestUseCase;
 
 
-import com.fiapx.core.domain.entities.ProcessingRequest;
-import com.fiapx.core.domain.repositories.IProcessingRequestRepository;
+
+import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
+import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
