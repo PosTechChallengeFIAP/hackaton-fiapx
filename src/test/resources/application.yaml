@@ -12,13 +12,12 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:public
+    username: sa
+    password: password
   jpa:
     hibernate:
-      ddl-auto: none
-    database-platform: org.hibernate.dialect.MySQLDialect
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.H2Dialect
   liquibase:
-    change-log: classpath:db/migration.xml
+    enabled: false

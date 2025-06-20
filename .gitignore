@@ -2,3 +2,5 @@ uploads/
 output/
 tempDir/
 target/
+.env
+.idea
