@@ -1,7 +1,6 @@
 package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsUseCase;
-
-import com.fiapx.core.domain.entities.ProcessingRequest;
-import com.fiapx.core.domain.repositories.IProcessingRequestRepository;
+import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
+import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ public class FindProcessingRequestsUseCaseTest {
 
     @MockitoBean
     IProcessingRequestRepository processingRequestRepository;
-
     @Autowired
     FindProcessingRequestsUseCase findProcessingRequestsUseCase;
 
