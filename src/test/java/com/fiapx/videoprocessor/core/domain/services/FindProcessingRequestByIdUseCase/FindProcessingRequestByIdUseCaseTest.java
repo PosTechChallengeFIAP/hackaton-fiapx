@@ -1,9 +1,9 @@
 package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestByIdUseCase;
 
-import com.fiapx.core.application.exceptions.ResourceNotFoundException;
-import com.fiapx.core.application.exceptions.ValidationException;
-import com.fiapx.core.domain.entities.ProcessingRequest;
-import com.fiapx.core.domain.repositories.IProcessingRequestRepository;
+import com.fiapx.videoprocessor.core.application.exceptions.ValidationException;
+import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
+import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestByIdUseCase.FindProcessingRequestByIdUseCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

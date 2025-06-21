@@ -1,12 +1,20 @@
 spring:
   application:
     name: hackaton-fiapx
+    storage: local
     upload-location: uploads
     output-location: output
     executor:
       pool-size: 5
       max-pool-size: 10
       queue-capacity: 25
+  cloud:
+    aws:
+      credentials:
+        access-key: ASIAX5HUC36RSLAE47MV
+        secret-key: NhaGL5IgePo2DnE+dGlZfz//HCD5wIpj1citBgOZ
+      region:
+        static: us-east-1
   servlet:
     multipart:
       max-file-size: 500MB

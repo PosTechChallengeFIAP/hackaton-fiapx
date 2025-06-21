@@ -6,12 +6,13 @@ import com.fiapx.videoprocessor.core.application.message.EMessageType;
 import com.fiapx.videoprocessor.core.application.message.MessageResponse;
 import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
-import com.fiapx.videoprocessor.core.domain.services.CreateProcessingRequestUseCase.ICreateProcessingRequestUseCase;
-import com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestByIdUseCase.IFindProcessingRequestByIdUseCase;
-import com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsByStatusUseCase.IFindProcessingRequestsByStatusUseCase;
-import com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsUseCase.IFindProcessingRequestsUseCase;
-import com.fiapx.videoprocessor.core.domain.services.ProcessVideoUseCase.IProcessVideoUseCase;
-import com.fiapx.videoprocessor.core.domain.services.SaveUploadedFileUseCase.ISaveUploadedFileUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.CreateProcessingRequestUseCase.ICreateProcessingRequestUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestByIdUseCase.IFindProcessingRequestByIdUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsByStatusUseCase.IFindProcessingRequestsByStatusUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsUseCase.IFindProcessingRequestsUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.GetFileUseCase.IGetFileUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.ProcessVideoUseCase.IProcessVideoUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.SaveFileUseCase.ISaveFileUseCase;
 import com.fiapx.videoprocessor.core.domain.services.utils.DateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -31,10 +32,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -47,7 +48,10 @@ public class ProcessingRequestController {
     private ICreateProcessingRequestUseCase createProcessingRequestUseCase;
 
     @Autowired
-    private ISaveUploadedFileUseCase saveUploadedFileUseCase;
+    private ISaveFileUseCase saveUploadedFileUseCase;
+
+    @Autowired
+    private IGetFileUseCase getFileUseCase;
 
     @Autowired
     private IProcessVideoUseCase processVideoUseCase;
@@ -60,6 +64,9 @@ public class ProcessingRequestController {
 
     @Autowired
     private IFindProcessingRequestsByStatusUseCase findProcessingRequestsByStatusUseCase;
+
+    @Value("${spring.application.upload-location}")
+    private String uploadDir;
 
     @Value("${spring.application.output-location}")
     private String outputDir;
@@ -91,7 +98,7 @@ public class ProcessingRequestController {
             String fileName = file.getOriginalFilename();
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
             String uploadedFileName = String.format("%s_%s", DateUtils.timestampToString(now), fileName);
-            saveUploadedFileUseCase.execute(uploadedFileName, file.getInputStream());
+            saveUploadedFileUseCase.execute(uploadedFileName, file.getInputStream(), uploadDir, false);
 
             ProcessingRequest request = new ProcessingRequest();
             request.setCreatedAt(now);
@@ -99,8 +106,6 @@ public class ProcessingRequestController {
             request.setInputFileName(uploadedFileName);
 
             request = createProcessingRequestUseCase.execute(request);
-
-            processVideoUseCase.execute(request);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(MessageResponse.type(EMessageType.SUCCESS).withMessage(request.getId().toString()));
@@ -170,6 +175,35 @@ public class ProcessingRequestController {
     }
 
     @SuppressWarnings("rawtypes")
+    @PostMapping("/process/{id}")
+    @Operation(summary = "Finds processing request by Id", description = "This endpoint is used to find processing request" +
+            " by Id",
+            tags = {"Process"},
+            responses ={
+                    @ApiResponse(description = "Success", responseCode = "200",
+                            content = {
+                                    @Content(schema = @Schema(implementation = ProcessingRequest.class))
+                            }),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized Access", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+            }
+    )
+    public ResponseEntity doProcessing(@PathVariable String id) {
+        ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
+
+        request = processVideoUseCase.execute(request);
+
+        if(EProcessingStatus.ERROR.equals(request.getStatus())){
+            return ResponseEntity.unprocessableEntity()
+                    .body(MessageResponse.type(EMessageType.ERROR).withMessage(request.getErrorMessage()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(request);
+    }
+
+    @SuppressWarnings("rawtypes")
     @GetMapping("/process/{id}/download")
     @Operation(summary = "Download resulted ZIP file", description = "This endpoint is used to fDownload resulted ZIP file.",
             tags = {"Process"},
@@ -186,7 +220,8 @@ public class ProcessingRequestController {
     public ResponseEntity downloadZipFile(@PathVariable String id){
         ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
 
-        Path filePath = Paths.get(outputDir, request.getOutputFileName());
+        File file = getFileUseCase.execute(outputDir, request.getOutputFileName());
+        Path filePath = file.toPath();
         Resource resource = null;
 
         try {

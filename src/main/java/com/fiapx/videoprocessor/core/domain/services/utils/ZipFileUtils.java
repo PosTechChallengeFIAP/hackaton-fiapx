@@ -10,7 +10,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipFileUtils {
-        public static void createZip(List<Path> filePaths, Path zipPath) throws IOException {
+        public static File createZip(List<Path> filePaths, Path zipPath) throws IOException {
             try (ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zipPath))) {
                 for (Path filePath : filePaths) {
                     File file = filePath.toFile();
@@ -30,5 +30,7 @@ public class ZipFileUtils {
                     }
                 }
             }
+
+            return zipPath.toFile();
         }
     }
