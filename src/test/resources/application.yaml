@@ -11,8 +11,8 @@ spring:
   cloud:
     aws:
       credentials:
-        access-key: ASIAX5HUC36RSLAE47MV
-        secret-key: NhaGL5IgePo2DnE+dGlZfz//HCD5wIpj1citBgOZ
+        access-key: any-key
+        secret-key: any-key
       region:
         static: us-east-1
   servlet:

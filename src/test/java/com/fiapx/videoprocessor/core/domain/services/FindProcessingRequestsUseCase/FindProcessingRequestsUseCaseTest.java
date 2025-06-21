@@ -19,7 +19,6 @@ public class FindProcessingRequestsUseCaseTest {
 
     @MockitoBean
     IProcessingRequestRepository processingRequestRepository;
-
     @Autowired
     FindProcessingRequestsUseCase findProcessingRequestsUseCase;
 
