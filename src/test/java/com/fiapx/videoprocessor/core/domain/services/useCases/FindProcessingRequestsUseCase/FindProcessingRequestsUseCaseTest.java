@@ -1,4 +1,4 @@
-package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsUseCase;
+package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestsUseCase;
 
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;

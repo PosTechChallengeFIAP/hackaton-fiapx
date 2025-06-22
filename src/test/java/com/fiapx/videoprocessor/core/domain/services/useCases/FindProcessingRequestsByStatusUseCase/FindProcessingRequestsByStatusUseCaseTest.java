@@ -1,4 +1,4 @@
-package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsByStatusUseCase;
+package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestsByStatusUseCase;
 
 import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;

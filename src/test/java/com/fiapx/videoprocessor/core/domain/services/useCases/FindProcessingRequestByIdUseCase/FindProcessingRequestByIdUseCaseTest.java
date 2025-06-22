@@ -1,4 +1,4 @@
-package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestByIdUseCase;
+package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestByIdUseCase;
 
 import com.fiapx.videoprocessor.core.application.exceptions.ValidationException;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
