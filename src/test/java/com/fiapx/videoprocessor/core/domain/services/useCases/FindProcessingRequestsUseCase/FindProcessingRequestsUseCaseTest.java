@@ -1,9 +1,8 @@
-package com.fiapx.videoprocessor.core.domain.services.FindProcessingRequestsByStatusUseCase;
+package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestsUseCase;
 
-import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
-import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsByStatusUseCase.FindProcessingRequestsByStatusUseCase;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsUseCase.FindProcessingRequestsUseCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,20 +12,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus.IN_PROGRESS;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class FindProcessingRequestsByStatusUseCaseTest {
+public class FindProcessingRequestsUseCaseTest {
 
     @MockitoBean
     IProcessingRequestRepository processingRequestRepository;
-
     @Autowired
-    FindProcessingRequestsByStatusUseCase findProcessingRequestsByStatusUseCase;
+    FindProcessingRequestsUseCase findProcessingRequestsUseCase;
 
     @Test
-    void executeTest(){
+    void executeFindAllTest(){
 
         ProcessingRequest req = new ProcessingRequest();
         req.setInputFileName("file.mp4");
@@ -34,14 +31,10 @@ public class FindProcessingRequestsByStatusUseCaseTest {
 
         List<ProcessingRequest> reqList = new ArrayList<>();
         reqList.add(req);
-        EProcessingStatus status = IN_PROGRESS;
 
-        when(processingRequestRepository.findRequestByStatus(status.ordinal()) ).thenReturn(reqList);
+        when(processingRequestRepository.findAll()).thenReturn(reqList);
 
-        List<ProcessingRequest> retrivedRequests = findProcessingRequestsByStatusUseCase.execute(status);
-
-        Assertions.assertEquals(reqList, retrivedRequests);
-
+        Assertions.assertEquals(reqList,findProcessingRequestsUseCase.execute());
     }
 
 }

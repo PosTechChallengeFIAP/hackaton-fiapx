@@ -1,83 +1,122 @@
 package com.fiapx.videoprocessor.core.domain.services.utils;
 
 import com.fiapx.videoprocessor.core.application.exceptions.DirectoryManagerException;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.channels.FileChannel;
+import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 public class DirectoryManagerTest {
 
-    private static final String TEST_DIR = "test-temp-dir";
+    private static final Path TEST_DIR = Paths.get("test-dir");
 
-    @Test
-    void createDir_shouldCreateDirectory() throws Exception {
-        // Act
-        DirectoryManager.createDir(TEST_DIR);
+    @BeforeEach
+    void setUp() throws IOException {
+        Files.createDirectories(TEST_DIR);
+    }
 
-        // Assert
-        Path dirPath = Path.of(TEST_DIR);
-        assertTrue(Files.exists(dirPath));
-        assertTrue(Files.isDirectory(dirPath));
-
-        // Cleanup
-        Files.deleteIfExists(dirPath);
+    @AfterEach
+    void tearDown() throws IOException {
+        if (Files.exists(TEST_DIR)) {
+            try (var paths = Files.walk(TEST_DIR)) {
+                paths.sorted((a, b) -> b.compareTo(a))
+                        .forEach(path -> {
+                            try {
+                                Files.deleteIfExists(path);
+                            } catch (IOException ignored) {
+                            }
+                        });
+            }
+        }
     }
 
     @Test
-    void recreateDir_shouldDeleteAndRecreateDirectory() throws Exception {
-        Path dirPath = Path.of(TEST_DIR);
-        Files.createDirectories(dirPath);
-        Files.createFile(dirPath.resolve("temp.txt")); // cria um arquivo dentro
+    void createDir_shouldCreateDirectory() throws Exception {
+        Path newDir = TEST_DIR.resolve("subdir");
 
-        // Act
-        DirectoryManager.recreateDir(TEST_DIR);
+        DirectoryManager.createDir(newDir);
 
-        // Assert
-        assertTrue(Files.exists(dirPath));
-        assertTrue(Files.isDirectory(dirPath));
-        assertEquals(0, Files.list(dirPath).count(), "Diretório deve estar vazio após recriação");
-
-        // Cleanup
-        Files.deleteIfExists(dirPath);
+        assertTrue(Files.exists(newDir));
+        assertTrue(Files.isDirectory(newDir));
     }
 
     @Test
     void createDir_shouldThrowException_whenCannotCreateDirectory() throws Exception {
-        // Cria um arquivo em vez de diretório
-        Path filePath = Path.of("some-file.txt");
+        Path filePath = TEST_DIR.resolve("someFile.txt");
         Files.createFile(filePath);
 
-        // Tenta criar um diretório com o mesmo nome do arquivo
-        DirectoryManagerException exception = assertThrows(
+        DirectoryManagerException ex = assertThrows(
                 DirectoryManagerException.class,
-                () -> DirectoryManager.createDir("some-file.txt")
+                () -> DirectoryManager.createDir(filePath)
         );
 
-        assertTrue(exception.getMessage().contains("Unable to create directory"));
+        assertTrue(ex.getMessage().contains("Unable to create directory"));
+    }
 
-        // Cleanup
+    @Test
+    void cleanUpDir_shouldDeleteFilesOlderThan30Days() throws Exception {
+        Path oldFile = TEST_DIR.resolve("old.txt");
+        Files.writeString(oldFile, "arquivo velho");
+        Files.setLastModifiedTime(oldFile, FileTime.from(Instant.now().minusSeconds(31 * 24 * 60 * 60))); // 31 dias
+
+        Path newFile = TEST_DIR.resolve("new.txt");
+        Files.writeString(newFile, "arquivo novo");
+
+        DirectoryManager.cleanUpDir(TEST_DIR);
+
+        assertFalse(Files.exists(oldFile), "Arquivo antigo deve ser deletado");
+        assertTrue(Files.exists(newFile), "Arquivo recente deve permanecer");
+    }
+
+    @Test
+    void cleanUpDir_shouldThrowException_whenDirectoryIsInvalid() {
+        Path invalidPath = TEST_DIR.resolve("nao-existe");
+
+        DirectoryManagerException ex = assertThrows(
+                DirectoryManagerException.class,
+                () -> DirectoryManager.cleanUpDir(invalidPath)
+        );
+
+        assertTrue(ex.getMessage().contains("Unable to read directory"));
+    }
+
+    @Test
+    void cleanUpDir_shouldHandleDeleteIOExceptionGracefully() throws IOException {
+        Path filePath = TEST_DIR.resolve("undeletable.txt");
+        Files.writeString(filePath, "arquivo para falha na exclusão");
+        Files.setLastModifiedTime(filePath, FileTime.from(Instant.now().minusSeconds(31 * 24 * 60 * 60))); // 31 dias
+
+        // Simula um arquivo "bloqueado" abrindo-o com canal não-fechado (em Windows impede exclusão)
+        FileChannel lock = FileChannel.open(filePath, StandardOpenOption.WRITE);
+
+        // Executa cleanup — não deve lançar exceção mesmo se não conseguir deletar
+        assertDoesNotThrow(() -> DirectoryManager.cleanUpDir(TEST_DIR));
+
+        // Cleanup: libera o lock e deleta o arquivo
+        lock.close();
         Files.deleteIfExists(filePath);
     }
 
     @Test
-    void recreateDir_shouldThrowException_whenWalkFails() throws IOException {
-        String testPath = "error-dir";
-        Path mockPath = Path.of(testPath);
+    void cleanUpDir_shouldNotFail_whenGettingLastModifiedTimeThrows() throws IOException {
+        // Arrange: cria um arquivo e depois o deleta antes de `isOlderThan()` ser chamado
+        Path file = TEST_DIR.resolve("temp.txt");
+        Files.writeString(file, "arquivo será apagado");
 
-        try (MockedStatic<Files> mockedFiles = org.mockito.Mockito.mockStatic(Files.class)) {
-            mockedFiles.when(() -> Files.exists(mockPath)).thenReturn(true);
-            mockedFiles.when(() -> Files.walk(mockPath)).thenThrow(new IOException("walk failed"));
+        // Usa um Thread para deletar o arquivo logo após a listagem começar
+        new Thread(() -> {
+            try {
+                Thread.sleep(100); // pequena pausa para garantir que `Files.list()` já começou
+                Files.deleteIfExists(file);
+            } catch (Exception ignored) {}
+        }).start();
 
-            DirectoryManagerException exception = assertThrows(
-                    DirectoryManagerException.class,
-                    () -> DirectoryManager.recreateDir(testPath)
-            );
-
-            assertTrue(exception.getMessage().contains("Unable to read existing temp directory"));
-        }
+        // Act + Assert: não deve lançar exceção mesmo com erro em getLastModifiedTime
+        assertDoesNotThrow(() -> DirectoryManager.cleanUpDir(TEST_DIR));
     }
 }
