@@ -37,10 +37,10 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
     private IGetFileUseCase getFileUseCase;
 
     @Value("${spring.application.upload-location}")
-    private String uploadDir;
+    public String uploadDir;
 
     @Value("${spring.application.output-location}")
-    private String outputDir;
+    public String outputDir;
 
     public ProcessingRequest execute(ProcessingRequest request) {
         List<Path> frames = null;
