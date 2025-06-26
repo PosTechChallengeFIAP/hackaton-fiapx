@@ -11,6 +11,7 @@ spring:
   cloud:
     aws:
       credentials:
+        type: ${AWS_CREDENTIALS_TYPE:session}
         access-key: ${AWS_ACCESS_KEY:access-key}
         secret-key: ${AWS_SECRET_KEY:secret-key}
         session-token: ${AWS_SESSION_TOKEN:session-token}
