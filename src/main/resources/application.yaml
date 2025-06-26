@@ -1,9 +1,9 @@
 spring:
   application:
     name: hackaton-fiapx
-    storage: aws
-    upload-location: ${FIAPX_UPLOAD_DIR}
-    output-location: ${FIAPX_OUTPUT_DIR}
+    storage: ${STORAGE_TYPE:local}
+    upload-location: ${UPLOAD_DIR:uploads}
+    output-location: ${OUTPUT_DIR:output}
     executor:
       pool-size: 5
       max-pool-size: 10
@@ -13,16 +13,17 @@ spring:
       credentials:
         access-key: ${AWS_ACCESS_KEY}
         secret-key: ${AWS_SECRET_KEY}
+        session-token: ${AWS_SESSION_TOKEN}
       region:
-        static: ${AWS_REGION}
+        static: ${AWS_REGION:us-east-1}
   servlet:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:video-processor}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
