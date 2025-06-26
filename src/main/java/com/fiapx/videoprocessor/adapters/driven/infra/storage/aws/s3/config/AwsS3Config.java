@@ -26,7 +26,6 @@ public class AwsS3Config {
 
     @Bean
     public S3Client s3Client() {
-        if(EStorageType.fromString(storageType).equals(EStorageType.LOCAL)) return null;
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
                 accessKey,
                 secretKey
