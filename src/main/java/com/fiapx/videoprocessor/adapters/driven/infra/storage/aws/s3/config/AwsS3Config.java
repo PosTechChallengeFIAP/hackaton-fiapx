@@ -1,5 +1,6 @@
 package com.fiapx.videoprocessor.adapters.driven.infra.storage.aws.s3.config;
 
+import com.fiapx.videoprocessor.adapters.driven.infra.storage.EStorageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class AwsS3Config {
+
+    @Value("${spring.application.storage}")
+    private String storageType;
 
     @Value("${spring.cloud.aws.region.static}")
     private String region;
@@ -22,6 +26,7 @@ public class AwsS3Config {
 
     @Bean
     public S3Client s3Client() {
+        if(EStorageType.fromString(storageType).equals(EStorageType.LOCAL)) return null;
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(
                 accessKey,
                 secretKey
