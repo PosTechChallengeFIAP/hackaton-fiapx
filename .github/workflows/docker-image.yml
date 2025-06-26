@@ -27,3 +27,9 @@ jobs:
 
       - name: Push Docker Image
         run: docker push ${{ secrets.DOCKER_HUB_USER }}/fiapx-video-processor:${{ env.TC_IMAGE_TAG }}
+      
+      - name: Tag Docker Image as Latest
+        run: docker image tag ${{ secrets.DOCKER_HUB_USER }}/fiapx-video-processor:${{ env.TC_IMAGE_TAG }} ${{ secrets.DOCKER_HUB_USER }}/fiapx-video-processor:latest
+
+      - name: Push Docker Image as Latest
+        run: docker push ${{ secrets.DOCKER_HUB_USER }}/fiapx-video-processor:latest
