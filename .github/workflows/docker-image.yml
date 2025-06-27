@@ -33,3 +33,14 @@ jobs:
 
       - name: Push Docker Image as Latest
         run: docker push ${{ secrets.DOCKER_HUB_USER }}/fiapx-video-processor:latest
+  trigger-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call helm repo workflow
+        run: |
+          curl -X POST https://api.github.com/repos/PosTechChallengeFIAP/fiapx-integration-helm-chart/dispatches \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.HELM_REPO_TOKEN }}" \
+          -d '{"event_type": "trigger-chart-deploy"}'
