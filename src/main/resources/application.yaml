@@ -22,7 +22,7 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:video-processor}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:video_processor}
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
