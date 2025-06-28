@@ -85,7 +85,7 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
             Path zipFilePath = Paths.get(outputDir, request.getOutputFileName());
             File zipFile = ZipFileUtils.createZip(frames,zipFilePath);
 
-            saveFileUseCase.execute(request.getOutputFileName(), new FileInputStream(zipFile), outputDir, true);
+            saveFileUseCase.execute(request.getOutputFileName(), new FileInputStream(zipFile), zipFile.length(), outputDir, true);
         }catch (IOException e) {
             request.setStatus(EProcessingStatus.ERROR);
             request.setErrorMessage("Unable to create ZIP file. " + e.getMessage());

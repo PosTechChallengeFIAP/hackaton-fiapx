@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 
 @Service("localSaveFileUseCase")
 public class SaveFileUseCase implements ISaveFileUseCase {
-    public void execute(String fileName, InputStream fileInputStream, String location, boolean skipLocal) {
+    public void execute(String fileName, InputStream fileInputStream, long contentLength, String location, boolean skipLocal) {
         if(skipLocal) return;
 
         try {
