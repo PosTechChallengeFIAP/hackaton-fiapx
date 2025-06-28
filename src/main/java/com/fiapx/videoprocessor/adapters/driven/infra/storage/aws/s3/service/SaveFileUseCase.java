@@ -4,6 +4,7 @@ import com.fiapx.videoprocessor.core.application.exceptions.UnableToSaveUploaded
 import com.fiapx.videoprocessor.core.domain.services.usecases.SaveFileUseCase.ISaveFileUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -20,22 +21,15 @@ public class SaveFileUseCase implements ISaveFileUseCase {
     private S3Client s3Client;
 
     public void execute(String fileName, InputStream fileInputStream, String location, boolean skipLocal) {
-        Path tempFile = null;
-
         try {
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(location)
                     .key(fileName)
                     .build();
 
-            tempFile = Path.of(String.format("tempDir/s3Temp/%s/%s", location, fileName));
-            Files.copy(fileInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-
-            s3Client.putObject(request, tempFile);
+            s3Client.putObject(request, RequestBody.fromInputStream(fileInputStream, fileInputStream.available()));
         } catch (IOException e) {
-            throw new UnableToSaveUploadedFileException(fileName,e);
-        }finally {
-            tempFile.toFile().delete();
+            throw new UnableToSaveUploadedFileException(fileName, e);
         }
     }
 }
