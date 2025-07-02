@@ -98,7 +98,7 @@ public class ProcessingRequestController {
             String fileName = file.getOriginalFilename();
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
             String uploadedFileName = String.format("%s_%s", DateUtils.timestampToString(now), fileName);
-            saveUploadedFileUseCase.execute(uploadedFileName, file.getInputStream(), file.getSize(),uploadDir, false);
+            saveUploadedFileUseCase.execute(uploadedFileName, file.getInputStream(), uploadDir, false);
 
             ProcessingRequest request = new ProcessingRequest();
             request.setCreatedAt(now);
