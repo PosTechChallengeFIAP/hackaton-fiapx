@@ -31,14 +31,15 @@ public class FindProcessingRequestsByStatusUseCaseTest {
         ProcessingRequest req = new ProcessingRequest();
         req.setInputFileName("file.mp4");
         req.setOutputFileName("file.zip");
+        req.setUsername("user-1");
 
         List<ProcessingRequest> reqList = new ArrayList<>();
         reqList.add(req);
         EProcessingStatus status = IN_PROGRESS;
 
-        when(processingRequestRepository.findRequestByStatus(status.ordinal()) ).thenReturn(reqList);
+        when(processingRequestRepository.findRequestByStatus(status.ordinal(),"user-1") ).thenReturn(reqList);
 
-        List<ProcessingRequest> retrivedRequests = findProcessingRequestsByStatusUseCase.execute(status);
+        List<ProcessingRequest> retrivedRequests = findProcessingRequestsByStatusUseCase.execute(status, "user-1");
 
         Assertions.assertEquals(reqList, retrivedRequests);
 

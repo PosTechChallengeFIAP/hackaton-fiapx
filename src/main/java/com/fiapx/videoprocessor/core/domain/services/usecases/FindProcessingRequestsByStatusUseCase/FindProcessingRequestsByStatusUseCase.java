@@ -13,7 +13,7 @@ public class FindProcessingRequestsByStatusUseCase implements IFindProcessingReq
     @Autowired
     private IProcessingRequestRepository processingRequestRepository;
 
-    public List<ProcessingRequest> execute(EProcessingStatus status) {
-        return processingRequestRepository.findRequestByStatus(status.ordinal());
+    public List<ProcessingRequest> execute(EProcessingStatus status, String username) {
+        return processingRequestRepository.findRequestByStatus(status.ordinal(), username);
     }
 }

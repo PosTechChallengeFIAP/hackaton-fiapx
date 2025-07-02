@@ -28,13 +28,14 @@ public class FindProcessingRequestsUseCaseTest {
         ProcessingRequest req = new ProcessingRequest();
         req.setInputFileName("file.mp4");
         req.setOutputFileName("file.zip");
+        req.setUsername("user-1");
 
         List<ProcessingRequest> reqList = new ArrayList<>();
         reqList.add(req);
 
-        when(processingRequestRepository.findAll()).thenReturn(reqList);
+        when(processingRequestRepository.findAll("user-1")).thenReturn(reqList);
 
-        Assertions.assertEquals(reqList,findProcessingRequestsUseCase.execute());
+        Assertions.assertEquals(reqList,findProcessingRequestsUseCase.execute("user-1"));
     }
 
 }

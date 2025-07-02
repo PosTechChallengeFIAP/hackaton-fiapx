@@ -37,6 +37,9 @@ public class ProcessingRequest {
     @Column
     private String errorMessage;
 
+    @Column
+    private String username;
+
     public void validate() throws ValidationException {
         if (Objects.isNull(this.inputFileName) || this.inputFileName.isEmpty()) {
             throw new ValidationException("Invalid file path");

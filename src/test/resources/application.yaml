@@ -8,11 +8,15 @@ spring:
       pool-size: 5
       max-pool-size: 10
       queue-capacity: 25
+  user-management:
+    url: ${USER_MANAGEMENT_URL:http://localhost:8081}
   cloud:
     aws:
       credentials:
+        type: ${AWS_CREDENTIALS_TYPE:session}
         access-key: any-key
         secret-key: any-key
+        session-token: session-token
       region:
         static: us-east-1
   servlet:

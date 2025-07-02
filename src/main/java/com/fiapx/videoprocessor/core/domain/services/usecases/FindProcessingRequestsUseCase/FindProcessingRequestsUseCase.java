@@ -12,7 +12,7 @@ public class FindProcessingRequestsUseCase implements IFindProcessingRequestsUse
     @Autowired
     private IProcessingRequestRepository processingRequestRepository;
 
-    public List<ProcessingRequest> execute() {
-        return processingRequestRepository.findAll();
+    public List<ProcessingRequest> execute(String username) {
+        return processingRequestRepository.findAll(username);
     }
 }

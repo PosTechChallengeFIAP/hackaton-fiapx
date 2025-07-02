@@ -17,6 +17,8 @@ spring:
         session-token: ${AWS_SESSION_TOKEN:session-token}
       region:
         static: ${AWS_REGION:us-east-1}
+  user-management:
+    url: ${USER_MANAGEMENT_URL:http://localhost:8081}
   servlet:
     multipart:
       max-file-size: 500MB

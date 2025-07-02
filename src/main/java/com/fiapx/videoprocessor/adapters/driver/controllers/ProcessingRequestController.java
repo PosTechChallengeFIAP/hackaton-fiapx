@@ -6,6 +6,7 @@ import com.fiapx.videoprocessor.core.application.message.EMessageType;
 import com.fiapx.videoprocessor.core.application.message.MessageResponse;
 import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
+import com.fiapx.videoprocessor.core.domain.entities.User;
 import com.fiapx.videoprocessor.core.domain.services.usecases.CreateProcessingRequestUseCase.ICreateProcessingRequestUseCase;
 import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestByIdUseCase.IFindProcessingRequestByIdUseCase;
 import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsByStatusUseCase.IFindProcessingRequestsByStatusUseCase;
@@ -13,6 +14,8 @@ import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequ
 import com.fiapx.videoprocessor.core.domain.services.usecases.GetFileUseCase.IGetFileUseCase;
 import com.fiapx.videoprocessor.core.domain.services.usecases.ProcessVideoUseCase.IProcessVideoUseCase;
 import com.fiapx.videoprocessor.core.domain.services.usecases.SaveFileUseCase.ISaveFileUseCase;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.fiapx.videoprocessor.core.domain.services.utils.DateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -88,6 +91,9 @@ public class ProcessingRequestController {
     )
     public ResponseEntity newProcessingRequest(@RequestParam("file") MultipartFile file){
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) auth.getPrincipal();
+
             if (file.isEmpty()) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
@@ -104,6 +110,7 @@ public class ProcessingRequestController {
             request.setCreatedAt(now);
             request.setStatus(EProcessingStatus.IN_PROGRESS);
             request.setInputFileName(uploadedFileName);
+            request.setUsername(currentUser.getUsername());
 
             request = createProcessingRequestUseCase.execute(request);
 
@@ -136,11 +143,14 @@ public class ProcessingRequestController {
             }
     )
     public ResponseEntity all(@RequestParam(required = false) EProcessingStatus status){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+
         if(Objects.isNull(status)){
-            return ResponseEntity.status(HttpStatus.OK).body(findProcessingRequestsUseCase.execute());
+            return ResponseEntity.status(HttpStatus.OK).body(findProcessingRequestsUseCase.execute(currentUser.getUsername()));
         }
         else{
-            return ResponseEntity.status(HttpStatus.OK).body(findProcessingRequestsByStatusUseCase.execute(status));
+            return ResponseEntity.status(HttpStatus.OK).body(findProcessingRequestsByStatusUseCase.execute(status, currentUser.getUsername()));
         }
     }
 
@@ -162,7 +172,16 @@ public class ProcessingRequestController {
     )
     public ResponseEntity one(@PathVariable String id) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(findProcessingRequestByIdUseCase.execute(id));
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) auth.getPrincipal();
+
+            ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
+
+            if(Objects.isNull(request.getUsername()) || !request.getUsername().equals(currentUser.getUsername()))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(MessageResponse.type(EMessageType.ERROR).withMessage("Forbidden to read another user's request"));
+
+            return ResponseEntity.status(HttpStatus.OK).body(request);
         } catch (ResourceNotFoundException ex) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
@@ -191,7 +210,14 @@ public class ProcessingRequestController {
             }
     )
     public ResponseEntity doProcessing(@PathVariable String id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+
         ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
+
+        if(Objects.isNull(request.getUsername()) || !request.getUsername().equals(currentUser.getUsername()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(MessageResponse.type(EMessageType.ERROR).withMessage("Forbidden to start processing of another user's request"));
 
         request = processVideoUseCase.execute(request);
 
@@ -205,7 +231,7 @@ public class ProcessingRequestController {
 
     @SuppressWarnings("rawtypes")
     @GetMapping("/process/{id}/download")
-    @Operation(summary = "Download resulted ZIP file", description = "This endpoint is used to fDownload resulted ZIP file.",
+    @Operation(summary = "Download resulted ZIP file", description = "This endpoint is used to Download resulted ZIP file.",
             tags = {"Process"},
             responses ={
                     @ApiResponse(description = "Success", responseCode = "200",
@@ -218,7 +244,14 @@ public class ProcessingRequestController {
             }
     )
     public ResponseEntity downloadZipFile(@PathVariable String id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+
         ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
+
+        if(Objects.isNull(request.getUsername()) || !request.getUsername().equals(currentUser.getUsername()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(MessageResponse.type(EMessageType.ERROR).withMessage("Forbidden to download results of another user's request"));
 
         File file = getFileUseCase.execute(outputDir, request.getOutputFileName());
         Path filePath = file.toPath();

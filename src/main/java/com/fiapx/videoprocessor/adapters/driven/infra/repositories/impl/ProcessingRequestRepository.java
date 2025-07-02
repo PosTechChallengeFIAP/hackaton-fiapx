@@ -21,8 +21,8 @@ public class ProcessingRequestRepository implements IProcessingRequestRepository
     }
 
     @Override
-    public List<ProcessingRequest> findAll() {
-        return processingRequestRepositoryJPA.findAll();
+    public List<ProcessingRequest> findAll(String username) {
+        return processingRequestRepositoryJPA.findAll(username);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class ProcessingRequestRepository implements IProcessingRequestRepository
     }
 
     @Override
-    public List<ProcessingRequest> findRequestByStatus(int idStatus) {
-        return processingRequestRepositoryJPA.findRequestByStatus(idStatus);
+    public List<ProcessingRequest> findRequestByStatus(int idStatus, String username) {
+        return processingRequestRepositoryJPA.findRequestByStatus(idStatus, username);
     }
 
     @Override

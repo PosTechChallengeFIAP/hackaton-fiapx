@@ -23,4 +23,12 @@
             <column name="error_message" type="text"/>
         </createTable>
     </changeSet>
+
+    <changeSet id="add-username" author="gteixeira">
+        <addColumn tableName="process">
+            <column name="username" type="varchar(255)" defaultValue="user-1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

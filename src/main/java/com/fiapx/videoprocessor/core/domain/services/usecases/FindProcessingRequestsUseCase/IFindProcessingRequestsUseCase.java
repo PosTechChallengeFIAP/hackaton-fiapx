@@ -5,5 +5,5 @@ import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import java.util.List;
 
 public interface IFindProcessingRequestsUseCase {
-    List<ProcessingRequest> execute();
+    List<ProcessingRequest> execute(String username);
 }
