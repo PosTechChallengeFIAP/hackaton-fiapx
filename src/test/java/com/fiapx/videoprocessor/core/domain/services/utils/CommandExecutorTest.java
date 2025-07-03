@@ -10,9 +10,9 @@ public class CommandExecutorTest {
 
     @Test
     void executeCommand_shouldReturnOutput_whenValidCommand() {
-        String output = CommandExecutor.executeCommand(Arrays.asList("cmd", "/c", "echo", "hello"));
+        String output = CommandExecutor.executeCommand(Arrays.asList("ffmpeg", "-version"));
 
-        assertTrue(output.contains("hello"));
+        assertTrue(output.contains("ffmpeg version"));
     }
 
     @Test
