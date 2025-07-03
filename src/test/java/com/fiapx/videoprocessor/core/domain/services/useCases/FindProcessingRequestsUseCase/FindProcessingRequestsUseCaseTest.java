@@ -1,6 +1,5 @@
 package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestsUseCase;
 
-import com.fiapx.videoprocessor.adapters.driven.infra.queue.aws.service.SQSListener;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
 import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestsUseCase.FindProcessingRequestsUseCase;
@@ -29,8 +28,6 @@ public class FindProcessingRequestsUseCaseTest {
     @MockitoBean
     private SqsTemplate sqsTemplate;
 
-    @MockitoBean
-    private SQSListener sqsListener;
     @Autowired
     FindProcessingRequestsUseCase findProcessingRequestsUseCase;
 

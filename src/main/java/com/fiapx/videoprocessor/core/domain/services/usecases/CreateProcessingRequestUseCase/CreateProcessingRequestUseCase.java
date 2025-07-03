@@ -19,13 +19,14 @@ public class CreateProcessingRequestUseCase implements ICreateProcessingRequestU
     @Value("${spring.cloud.aws.sqs.name}")
     public String queueName;
 
-    public ProcessingRequest execute(ProcessingRequest request) {
+    public ProcessingRequest execute(ProcessingRequest request, String token) {
         request.validate();
 
         request = processingRequestRepository.save(request);
 
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.setId(request.getId().toString());
+        requestMessage.setToken(token);
         sqsTemplate.send(queueName, requestMessage);
 
         return request;

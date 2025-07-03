@@ -90,8 +90,10 @@ public class ProcessingRequestController {
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             }
     )
-    public ResponseEntity newProcessingRequest(@RequestParam("file") MultipartFile file){
+    public ResponseEntity newProcessingRequest(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String authHeader){
         try {
+            String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = (User) auth.getPrincipal();
 
@@ -113,7 +115,7 @@ public class ProcessingRequestController {
             request.setInputFileName(uploadedFileName);
             request.setUsername(currentUser.getUsername());
 
-            request = createProcessingRequestUseCase.execute(request);
+            request = createProcessingRequestUseCase.execute(request, token);
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(MessageResponse.type(EMessageType.SUCCESS).withMessage(request.getId().toString()));

@@ -1,6 +1,5 @@
 package com.fiapx.videoprocessor.core.domain.services.utils;
 
-import com.fiapx.videoprocessor.adapters.driven.infra.queue.aws.service.SQSListener;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,9 +15,6 @@ public class CheckFileExtensionTest {
 
     @MockitoBean
     private SqsTemplate sqsTemplate;
-
-    @MockitoBean
-    private SQSListener sqsListener;
 
     @Test
     void executeTrueTest(){

@@ -1,6 +1,5 @@
 package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestsByStatusUseCase;
 
-import com.fiapx.videoprocessor.adapters.driven.infra.queue.aws.service.SQSListener;
 import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
@@ -33,9 +32,6 @@ public class FindProcessingRequestsByStatusUseCaseTest {
 
     @MockitoBean
     private SqsTemplate sqsTemplate;
-
-    @MockitoBean
-    private SQSListener sqsListener;
 
     @Test
     void executeTest(){
