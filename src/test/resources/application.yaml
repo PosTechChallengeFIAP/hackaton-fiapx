@@ -20,6 +20,7 @@ spring:
       region:
         static: us-east-1
       sqs:
+        name: sqs-name
         endpoint: sqs-endpoint
   servlet:
     multipart:

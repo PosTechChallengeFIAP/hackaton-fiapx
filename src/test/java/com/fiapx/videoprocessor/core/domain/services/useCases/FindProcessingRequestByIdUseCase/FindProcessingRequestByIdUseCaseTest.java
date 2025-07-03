@@ -1,14 +1,17 @@
 package com.fiapx.videoprocessor.core.domain.services.useCases.FindProcessingRequestByIdUseCase;
 
+import com.fiapx.videoprocessor.adapters.driven.infra.queue.aws.service.SQSListener;
 import com.fiapx.videoprocessor.core.application.exceptions.ValidationException;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
 import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestByIdUseCase.FindProcessingRequestByIdUseCase;
+import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +24,15 @@ public class FindProcessingRequestByIdUseCaseTest {
 
     @MockitoBean
     IProcessingRequestRepository processingRequestRepository;
+
+    @MockitoBean
+    private SqsAsyncClient sqsAsyncClient;
+
+    @MockitoBean
+    private SqsTemplate sqsTemplate;
+
+    @MockitoBean
+    private SQSListener sqsListener;
 
     @Autowired
     FindProcessingRequestByIdUseCase findProcessingRequestByIdUseCase;
