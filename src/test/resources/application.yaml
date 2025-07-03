@@ -27,6 +27,7 @@ spring:
     url: jdbc:h2:mem:public
     username: sa
     password: password
+    type: com.zaxxer.hikari.HikariDataSource
   jpa:
     hibernate:
       ddl-auto: create
