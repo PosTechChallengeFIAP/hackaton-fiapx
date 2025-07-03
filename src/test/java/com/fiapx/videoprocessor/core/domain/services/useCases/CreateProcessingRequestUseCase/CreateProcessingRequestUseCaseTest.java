@@ -40,7 +40,7 @@ public class CreateProcessingRequestUseCaseTest {
 
         when(processingRequestRepository.save(req)).thenReturn(req);
 
-        ProcessingRequest requestResult = createProcessingRequestUseCase.execute(req);
+        ProcessingRequest requestResult = createProcessingRequestUseCase.execute(req, "any-token");
 
         Assertions.assertEquals(req, requestResult);
     }
