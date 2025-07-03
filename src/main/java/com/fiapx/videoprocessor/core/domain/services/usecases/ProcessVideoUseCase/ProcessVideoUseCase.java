@@ -1,6 +1,7 @@
 package com.fiapx.videoprocessor.core.domain.services.usecases.ProcessVideoUseCase;
 
 import com.fiapx.videoprocessor.core.application.exceptions.DirectoryManagerException;
+import com.fiapx.videoprocessor.core.application.exceptions.RequestIsAlreadyProcessed;
 import com.fiapx.videoprocessor.core.domain.entities.EProcessingStatus;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
 import com.fiapx.videoprocessor.core.domain.repositories.IProcessingRequestRepository;
@@ -43,6 +44,10 @@ public class ProcessVideoUseCase implements IProcessVideoUseCase {
     public String outputDir;
 
     public ProcessingRequest execute(ProcessingRequest request) {
+        if(EProcessingStatus.COMPLETED.equals(request.getStatus())){
+            throw new RequestIsAlreadyProcessed(request.getId());
+        }
+
         List<Path> frames = null;
         String tempFolderPath = "tempDir/processing/" + request.getId().toString();
 

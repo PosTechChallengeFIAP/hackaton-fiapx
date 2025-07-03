@@ -19,6 +19,8 @@ spring:
         session-token: session-token
       region:
         static: us-east-1
+      sqs:
+        endpoint: sqs-endpoint
   servlet:
     multipart:
       max-file-size: 500MB

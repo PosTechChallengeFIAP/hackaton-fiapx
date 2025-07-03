@@ -17,6 +17,9 @@ spring:
         session-token: ${AWS_SESSION_TOKEN:session-token}
       region:
         static: ${AWS_REGION:us-east-1}
+      sqs:
+        name: ${AWS_SQS_NAME:processing-request-queue}
+        endpoint: ${AWS_SQS_ENDPOINT}
   user-management:
     url: ${USER_MANAGEMENT_URL:http://localhost:8081}
   servlet:

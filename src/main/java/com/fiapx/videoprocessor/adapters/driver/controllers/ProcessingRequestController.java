@@ -1,5 +1,6 @@
 package com.fiapx.videoprocessor.adapters.driver.controllers;
 
+import com.fiapx.videoprocessor.core.application.exceptions.RequestIsAlreadyProcessed;
 import com.fiapx.videoprocessor.core.application.exceptions.ResourceNotFoundException;
 import com.fiapx.videoprocessor.core.application.exceptions.ValidationException;
 import com.fiapx.videoprocessor.core.application.message.EMessageType;
@@ -219,7 +220,12 @@ public class ProcessingRequestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(MessageResponse.type(EMessageType.ERROR).withMessage("Forbidden to start processing of another user's request"));
 
-        request = processVideoUseCase.execute(request);
+        try {
+            request = processVideoUseCase.execute(request);
+        }catch (RequestIsAlreadyProcessed ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(MessageResponse.type(EMessageType.ERROR).withMessage(ex.getMessage()));
+        }
 
         if(EProcessingStatus.ERROR.equals(request.getStatus())){
             return ResponseEntity.unprocessableEntity()
