@@ -20,8 +20,7 @@ jobs:
       - name: Set up FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
         with:
-          ffmpeg-version: release  # or specify like "6.1.0"
-          linking-type: static     # or "shared" for Windows
+          ffmpeg-version: release
 
       - name: Set up JDK
         uses: actions/setup-java@v3
