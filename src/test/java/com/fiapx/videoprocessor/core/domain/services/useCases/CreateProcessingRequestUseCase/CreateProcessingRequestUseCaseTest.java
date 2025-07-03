@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -36,6 +38,7 @@ public class CreateProcessingRequestUseCaseTest {
     void executeTest(){
 
         ProcessingRequest req = new ProcessingRequest();
+        req.setId(UUID.randomUUID());
         req.setInputFileName("file.mp4");
         req.setOutputFileName("file.zip");
 
