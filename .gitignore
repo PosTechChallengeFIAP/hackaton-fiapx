@@ -4,3 +4,4 @@ tempDir/
 target/
 .env
 .idea
+ajcore*.txt

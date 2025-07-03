@@ -1,0 +1,46 @@
+name: Run Tests and Generate Allure Report
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Short commit hash
+        run: echo "REPORT_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
+
+      - name: Run tests with Allure results
+        run: mvn clean test
+
+      - name: Generate Allure Report
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.25.0.zip
+          unzip allure-2.25.0.zip
+          ./allure-2.25.0/bin/allure generate target/allure-results --clean -o target/allure-report
+
+      - name: Upload Allure Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ env.REPORT_TAG }}
+          path: target/allure-report
