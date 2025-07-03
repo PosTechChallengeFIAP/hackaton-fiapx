@@ -17,6 +17,12 @@ jobs:
       - name: Get Short commit hash
         run: echo "REPORT_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      - name: Set up FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          ffmpeg-version: release  # or specify like "6.1.0"
+          linking-type: static     # or "shared" for Windows
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
