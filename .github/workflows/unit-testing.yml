@@ -17,10 +17,8 @@ jobs:
       - name: Get Short commit hash
         run: echo "REPORT_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Set up FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
-        with:
-          ffmpeg-version: release
+      - name: Install FFmpeg manually
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Set up JDK
         uses: actions/setup-java@v3
