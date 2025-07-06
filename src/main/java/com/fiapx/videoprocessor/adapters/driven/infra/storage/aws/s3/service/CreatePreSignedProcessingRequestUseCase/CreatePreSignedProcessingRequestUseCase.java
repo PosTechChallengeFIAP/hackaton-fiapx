@@ -1,5 +1,6 @@
 package com.fiapx.videoprocessor.adapters.driven.infra.storage.aws.s3.service.CreatePreSignedProcessingRequestUseCase;
 
+import com.fiapx.videoprocessor.adapters.driven.infra.storage.aws.s3.config.EPreSignedUrlType;
 import com.fiapx.videoprocessor.adapters.driven.infra.storage.aws.s3.service.GeneratePreSignedUrlUseCase.IGeneratePreSignedUrlUseCase;
 import com.fiapx.videoprocessor.core.domain.entities.PreSignedResponse;
 import com.fiapx.videoprocessor.core.domain.entities.ProcessingRequest;
@@ -25,7 +26,7 @@ public class CreatePreSignedProcessingRequestUseCase implements ICreatePreSigned
         PreSignedResponse response = new PreSignedResponse();
         response.setId(request.getId().toString());
 
-        URL preSignedUrl = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(location, request.getInputFileName());
+        URL preSignedUrl = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(location, request.getInputFileName(), EPreSignedUrlType.UPLOAD);
         response.setPreSignedUrl(preSignedUrl.toString());
 
         return response;
