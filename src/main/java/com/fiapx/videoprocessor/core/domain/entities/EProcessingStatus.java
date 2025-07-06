@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum EProcessingStatus {
+    PRE_SIGNED("Pre Signed"),
     IN_PROGRESS("In Progress"),
     COMPLETED("Completed"),
     ERROR("error");
