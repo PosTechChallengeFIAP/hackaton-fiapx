@@ -9,6 +9,7 @@ import com.fiapx.videoprocessor.core.application.exceptions.ValidationException;
 import com.fiapx.videoprocessor.core.application.message.EMessageType;
 import com.fiapx.videoprocessor.core.application.message.MessageResponse;
 import com.fiapx.videoprocessor.core.domain.entities.*;
+import com.fiapx.videoprocessor.core.domain.services.usecases.FindProcessingRequestByIdUseCase.IFindProcessingRequestByIdUseCase;
 import com.fiapx.videoprocessor.core.domain.services.utils.DateUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -41,6 +42,9 @@ public class PreSignedController {
 
     @Autowired
     private IGeneratePreSignedUrlUseCase generatePreSignedUrlUseCase;
+
+    @Autowired
+    private IFindProcessingRequestByIdUseCase findProcessingRequestByIdUseCase;
 
     @Value("${spring.application.upload-location}")
     private String uploadDir;
@@ -166,7 +170,9 @@ public class PreSignedController {
                         .body(MessageResponse.type(EMessageType.ERROR).withMessage("Pre Sign Service is only available for AWS Storage."));
             }
 
-            URL url = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(uploadDir, id, EPreSignedUrlType.DOWNLOAD);
+            ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
+
+            URL url = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(uploadDir, request.getOutputFileName(), EPreSignedUrlType.DOWNLOAD);
 
             return ResponseEntity.ok(MessageResponse.type(EMessageType.SUCCESS).withMessage(url.toString()));
         }catch (RuntimeException ex){
