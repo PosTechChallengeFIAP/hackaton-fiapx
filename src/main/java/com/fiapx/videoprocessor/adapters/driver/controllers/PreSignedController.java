@@ -172,7 +172,7 @@ public class PreSignedController {
 
             ProcessingRequest request = findProcessingRequestByIdUseCase.execute(id);
 
-            URL url = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(uploadDir, request.getOutputFileName(), EPreSignedUrlType.DOWNLOAD);
+            URL url = generatePreSignedUrlUseCase.generatePreSignedUploadUrl(outputDir, request.getOutputFileName(), EPreSignedUrlType.DOWNLOAD);
 
             return ResponseEntity.ok(MessageResponse.type(EMessageType.SUCCESS).withMessage(url.toString()));
         }catch (RuntimeException ex){
